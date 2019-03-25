@@ -31,45 +31,37 @@ const ME = (mantissa: number, exponent: number) => Decimal.fromMantissaExponent(
 const ME_NN = (mantissa: number, exponent: number) => Decimal.fromMantissaExponent_noNormalize(mantissa, exponent);
 
 type DecimalSource = Decimal | number | string;
+type Sign = -1 | 0 | 1;
 
 export default class Decimal {
 
   get m() {
-    return this.mantissa;
-  }
-
-  set m(value) {
-    this.mantissa = value;
+      return this.mantissa === 0
+          ? 0
+          : this.mantissa * Math.pow(10, this.exponent - Math.floor(this.exponent));
   }
 
   get e() {
-    return this.exponent;
+    return Math.floor(this.exponent);
   }
 
   set e(value) {
-    this.exponent = value;
+    this.exponent += value - Math.floor(this.exponent);
   }
 
   get s() {
-    return this.sign();
+    return this.mantissa;
   }
 
   set s(value) {
-    if (value === 0) {
-      this.e = 0;
-      this.m = 0;
-      return;
-    }
-    if (this.sgn() !== value) {
-      this.m = -this.m;
-    }
+    if (this.mantissa !== 0) this.mantissa = value;
   }
 
   public static fromMantissaExponent(mantissa: number, exponent: number) {
     return new Decimal().fromMantissaExponent(mantissa, exponent);
   }
 
-  public static fromMantissaExponent_noNormalize(mantissa: number, exponent: number) {
+  public static fromMantissaExponent_noNormalize(mantissa: Sign, exponent: number) {
     return new Decimal().fromMantissaExponent_noNormalize(mantissa, exponent);
   }
 

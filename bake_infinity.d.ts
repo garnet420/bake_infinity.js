@@ -1,10 +1,13 @@
 declare type DecimalSource = Decimal | number | string;
+
+declare type Sign = -1 | 0 | 1;
+
 export default class Decimal {
-    m: number;
+    m: Sign;
     e: number;
-    s: number;
+    s: Sign;
     static fromMantissaExponent(mantissa: number, exponent: number): Decimal;
-    static fromMantissaExponent_noNormalize(mantissa: number, exponent: number): Decimal;
+    static fromMantissaExponent_noNormalize(mantissa: Sign, exponent: number): Decimal;
     static fromDecimal(value: Decimal): Decimal;
     static fromNumber(value: number): Decimal;
     static fromString(value: string): Decimal;
