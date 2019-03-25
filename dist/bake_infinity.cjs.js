@@ -435,14 +435,14 @@ function () {
     return ME(mantissa, exponent);
     /*
       Examples:
-            randomly test pow:
-            var a = Decimal.randomDecimalForTesting(1000);
+           randomly test pow:
+           var a = Decimal.randomDecimalForTesting(1000);
       var pow = Math.random()*20-10;
       if (Math.random()*2 < 1) { pow = Math.round(pow); }
       var result = Decimal.pow(a, pow);
       ["(" + a.toString() + ")^" + pow.toString(), result.toString()]
-            randomly test add:
-            var a = Decimal.randomDecimalForTesting(1000);
+           randomly test add:
+           var a = Decimal.randomDecimalForTesting(1000);
       var b = Decimal.randomDecimalForTesting(17);
       var c = a.mul(b);
       var result = a.add(c);
@@ -925,7 +925,7 @@ function () {
 
     /*
     from smallest to largest:
-          -3e100
+         -3e100
     -1e100
     -3e99
     -1e99
@@ -946,7 +946,7 @@ function () {
     3e99
     1e100
     3e100
-          */
+         */
 
     if (this.mantissa === 0) {
       if (decimal.mantissa === 0) {

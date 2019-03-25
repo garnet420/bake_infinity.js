@@ -1,7 +1,7 @@
 import { Config } from "bili"
 
 const config: Config = {
-    input: "src/break_infinity.ts",
+    input: "src/bake_infinity.ts",
     output: {
         format: ["umd", "umd-min", "esm", "cjs"],
         moduleName: "Decimal",
@@ -9,11 +9,11 @@ const config: Config = {
         fileName: (context, defaultFileName) => {
             switch (context.format) {
                 case "umd":
-                    return context.minify ? "break_infinity.min.js" : "break_infinity.js";
+                    return context.minify ? "bake_infinity.min.js" : "bake_infinity.js";
                 case "esm":
-                    return "break_infinity.esm.js";
+                    return "bake_infinity.esm.js";
                 case "cjs":
-                    return "break_infinity.cjs.js";
+                    return "bake_infinity.cjs.js";
                 default:
                     return defaultFileName;
             }
