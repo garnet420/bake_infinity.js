@@ -13,6 +13,14 @@ const NUMBER_EXP_MAX = 308;
 // The smallest exponent that can appear in a Number, though not all mantissas are valid here.
 const NUMBER_EXP_MIN = -324;
 
+const SQRT_MAX_VALUE = Math.sqrt(Number.MAX_VALUE);
+const RSQRT_MAX_VALUE = 1 / Math.sqrt(Number.MAX_VALUE);
+const LOG_MAX_VALUE = Math.log10(Number.MAX_VALUE);
+const RECIP_MAX_VALUE = 1 / Number.MAX_VALUE;
+const LARGEST_POWER_OF_10 = 1e308; // must match NUMBER_EXP_MAX
+
+const RLOG_MAX_VALUE = 1 / Math.log10(Number.MAX_VALUE);
+
 const powerOf10 = (() => {
   // We need this lookup table because Math.pow(10, exponent)
   // when exponent's absolute value is large is slightly inaccurate.
@@ -1185,6 +1193,60 @@ export default class Decimal {
   }
 
   public pow(value: number | Decimal) {
+    if (this.mantissa === 0) {
+      if (value instanceof Decimal) {
+        // 0^0 is 1 by convention
+        if (value.mantissa === 0) return ME_NN(1, 0);
+        // we don't worry about odd decimal powers and negative 0 because determining whether
+        // a Decimal is an integer is annoying
+        if (value.mantissa === 1) return ME_NN(0, 0);
+        return ME_NN(1, Number.POSITIVE_INFINITY);
+      } else {
+        if (value === 0) return ME_NN(1, 0);
+        if (value > 0) {
+          // -0 to an odd power is -0
+          if (Number.isInteger(value)) return ME_NN(value % 2 ? this.mantissa : 0, 0);
+          return ME_NN(0, 0);
+        } else {
+          if (Number.isInteger(value)) {
+            return ME_NN(value % 2 ? Math.sign(1 / this.mantissa) : 1, Number.POSITIVE_INFINITY);
+          }
+          return ME_NN(1, Number.POSITIVE_INFINITY);
+        }
+      }
+    }
+    // Technically, we can represent values much closer to 1 than normal numbers can --
+    // e.g. exponent = 1e-323. This means that we can support larger exponents in pow, as
+    // well -- it would take something like an exponent of 1e700 to make that value overflow.
+    if (value instanceof Decimal) {
+      // Infinity^0 should yield NaN, but we don't bother
+      if (value.mantissa === 0) return ME_NN(1, 0);
+      if (Number.isInteger(value.exponent)) {
+        if (value.exponent >= NUMBER_EXP_MAX) {
+          if (this.exponent >= 1 || value.exponent >= 2*NUMBER_EXP_MAX) {
+            // Large exponents produce either 0 or infinity
+            return value.mantissa === 1 ? ME_NN(1, Number.POSITIVE_INFINITY) : ME_NN(0, 0);
+          }
+          if (value.mantissa === 1) {
+            return ME_NN(1, this.exponent * LARGEST_POWER_OF_10 * )
+      }
+      if (this.mantissa === 1) {
+        if (this.exponent === 0) return ME_NN(1, 0);
+        if (value.exponent >= NUMBER_EXP_MAX) {
+          if (this.exponent >= 1 || value.exponent >= 2*NUMBER_EXP_MAX) return ME_NN(1, Number.POSITIVE_INFINITY);
+          return ME_NN(1, this.exponent * LARGEST_POWER_OF_10 * powerOf10(value.exponent - NUMBER_EXP_MAX));
+        } else if (value.exponent > NUMBER_EXP_MIN) {
+          return ME_NN(1, this.exponent * powerOf10(value.exponent));
+        }
+
+      }
+    } else {
+      if (this.mantissa === 1) return ME_NN(1, this.exponent * value);
+      if (Number.isInteger(value)) {
+        return ME_NN(value % 2 ? -1 : 1, this.exponent * value);
+      }
+      return new Decimal(Number.NaN);
+    }
     // UN-SAFETY: Accuracy not guaranteed beyond ~9~11 decimal places.
     // TODO: Decimal.pow(new Decimal(0.5), 0); or Decimal.pow(new Decimal(1), -1);
     //  makes an exponent of -0! Is a negative zero ever a problem?
@@ -1249,18 +1311,12 @@ export default class Decimal {
   }
 
   public sqr() {
-    return ME(Math.pow(this.mantissa, 2), this.exponent * 2);
+    return ME_NN(Math.abs(this.mantissa), this.exponent * 2);
   }
 
   public sqrt() {
-    if (this.mantissa < 0) {
-      return new Decimal(Number.NaN);
-    }
-    if (this.exponent % 2 !== 0) {
-      return ME(Math.sqrt(this.mantissa) * 3.16227766016838, Math.floor(this.exponent / 2));
-    }
-    // Mod of a negative number is negative, so != means '1 or -1'
-    return ME(Math.sqrt(this.mantissa), Math.floor(this.exponent / 2));
+    if (this.mantissa < 0) return new Decimal(Number.NaN);
+    return ME_NN(this.mantissa, this.exponent * 0.5);
   }
 
   public cube() {

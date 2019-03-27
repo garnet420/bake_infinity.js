@@ -107,6 +107,7 @@ export default class Decimal {
     private static affordArithmeticSeries_core;
     private static sumArithmeticSeries_core;
     private static efficiencyOfPurchase_core;
+    private static NaN: Decimal;
     mantissa: number;
     exponent: number;
     constructor(value?: DecimalSource);
